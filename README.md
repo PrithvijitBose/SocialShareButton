@@ -71,7 +71,7 @@ Lightweight social sharing component for web applications. Zero dependencies, fr
 
 ## Features
 
-- 🌐 Multiple platforms: WhatsApp, Facebook, X, LinkedIn, Telegram, Reddit, Email, Pinterest
+- 🌐 Multiple platforms: WhatsApp, Facebook, X, LinkedIn, Telegram, Reddit, Email, Pinterest, Discord
 - 🎯 Zero dependencies - pure vanilla JavaScript
 - ⚛️ Framework support: React, Preact, Next.js, Qwik, Vue, Angular, or plain HTML
 - 🔄 Auto-detects current URL and page title
@@ -528,7 +528,7 @@ new SocialShareButton({
 | `onCopy`           | function       | `null`                 | Callback when user copies link: `(url) => {}`      |
 
 **Available Platforms:**  
-`whatsapp`, `facebook`, `twitter`, `linkedin`, `telegram`, `reddit`, `email`, `pinterest`
+`whatsapp`, `facebook`, `twitter`, `linkedin`, `telegram`, `reddit`, `email`, `pinterest`, `discord`
 
 ### Customize Share Message/Post Text
 
@@ -555,7 +555,8 @@ new SocialShareButton({
 - **Reddit:** `title` - `description` (used as title)
 - **Email:** Subject = `title`, Body = `description` + link
 - **Pinterest:** `title` + `description` + `hashtags` + link
-
+- **Discord:** `title` + `description` + `hashtags` + link
+- 
 ### Customize Button Color & Appearance
 
 **Option 1: Use Pre-built Styles** (Easiest)

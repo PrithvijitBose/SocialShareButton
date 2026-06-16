@@ -13,7 +13,7 @@ export const SocialShareButton = ({
   description = "",
   hashtags = [],
   via = "",
-  platforms = ["whatsapp", "facebook", "twitter", "linkedin", "telegram", "reddit", "pinterest"],
+  platforms = ["whatsapp", "facebook", "twitter", "linkedin", "telegram", "reddit", "pinterest", "discord"],
   theme = "dark",
   buttonText = "Share",
   customClass = "",
@@ -21,7 +21,7 @@ export const SocialShareButton = ({
   onCopy = null,
   buttonStyle = "default",
   modalPosition = "center",
-  
+
   // Analytics: library emits events but never collects data
   analytics = true,
   onAnalytics = null, // Event callback
@@ -31,7 +31,7 @@ export const SocialShareButton = ({
 }) => {
   // DOM reference for the injection target
   const containerRef = useRef(null);
-  
+
   // Reference to the vanilla JS class instance
   const shareButtonRef = useRef(null);
 
@@ -46,39 +46,39 @@ export const SocialShareButton = ({
    * Includes a safe check for the global SocialShareButton class.
    */
   useEffect(() => {
-      if (containerRef.current && !shareButtonRef.current) {
-        if (typeof window !== "undefined" && window.SocialShareButton) {
-          shareButtonRef.current = new window.SocialShareButton({
-            container: containerRef.current,
-            url: currentUrl,
-            title: currentTitle,
-            description,
-            hashtags,
-            via,
-            platforms,
-            theme,
-            buttonText,
-            customClass,
-            onShare,
-            onCopy,
-            buttonStyle,
-            modalPosition,
-            analytics,
-            onAnalytics,
-            analyticsPlugins,
-            componentId,
-            debug,
-          });
-        }
+    if (containerRef.current && !shareButtonRef.current) {
+      if (typeof window !== "undefined" && window.SocialShareButton) {
+        shareButtonRef.current = new window.SocialShareButton({
+          container: containerRef.current,
+          url: currentUrl,
+          title: currentTitle,
+          description,
+          hashtags,
+          via,
+          platforms,
+          theme,
+          buttonText,
+          customClass,
+          onShare,
+          onCopy,
+          buttonStyle,
+          modalPosition,
+          analytics,
+          onAnalytics,
+          analyticsPlugins,
+          componentId,
+          debug,
+        });
       }
+    }
 
-      return () => {
-        if (shareButtonRef.current) {
-          shareButtonRef.current.destroy();
-          shareButtonRef.current = null;
-        }
-      };
-    }, []);
+    return () => {
+      if (shareButtonRef.current) {
+        shareButtonRef.current.destroy();
+        shareButtonRef.current = null;
+      }
+    };
+  }, []);
 
   /**
    * Update Effect
@@ -86,7 +86,7 @@ export const SocialShareButton = ({
    * Synchronizes React prop changes with the underlying vanilla JS instance 
    * without re-mounting the entire component.
    */
-  
+
   useEffect(() => {
     if (shareButtonRef.current) {
       // Use the library's built-in update method
