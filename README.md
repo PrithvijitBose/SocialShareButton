@@ -71,7 +71,7 @@ Lightweight social sharing component for web applications. Zero dependencies, fr
 
 ## Features
 
-- 🌐 Multiple platforms: WhatsApp, Facebook, X, LinkedIn, Telegram, Reddit, Email, Pinterest
+- 🌐 Multiple platforms: WhatsApp, Facebook, X, LinkedIn, Telegram, Reddit, Email, Pinterest, Discord
 - 🎯 Zero dependencies - pure vanilla JavaScript
 - ⚛️ Framework support: React, Preact, Next.js, Qwik, Vue, Angular, or plain HTML
 - 🔄 Auto-detects current URL and page title
