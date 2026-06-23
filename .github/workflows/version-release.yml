@@ -8,13 +8,17 @@ on:
       - 'VERSION'
   workflow_dispatch:
 
-permissions:
-  contents: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release:
     if: ${{ github.repository_owner == 'AOSSIE-Org' }}
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -22,13 +26,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Verify actor is a maintainer
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -44,45 +48,41 @@ jobs:
               console.log(`✓ Actor '${context.actor}' is a verified repository maintainer.`);
             }
 
-      - name: Read VERSION file
+      - name: Read and Validate VERSION
         id: get_version
         run: |
           VERSION=$(cat VERSION | tr -d '[:space:]')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version detected: $VERSION"
-
-      - name: Validate VERSION format
-        run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
           if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Error: VERSION must follow semantic versioning (e.g., 1.0.0)"
             exit 1
           fi
           echo "✓ Version format is valid: $VERSION"
-
-      - name: Check if tag already exists
-        run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
-          if git show-ref --tags --verify --quiet "refs/tags/v$VERSION"; then
-            echo "Error: Tag v$VERSION already exists"
-            exit 1
-          fi
-          echo "✓ Tag v$VERSION does not exist yet"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create and push tag
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "v$VERSION" -m "Release version $VERSION"
-          git push origin "v$VERSION"
-          echo "✓ Created and pushed tag v$VERSION"
+          if git show-ref --tags --verify --quiet "refs/tags/v$VERSION"; then
+            if [ "$(git rev-parse HEAD)" = "$(git rev-parse refs/tags/v$VERSION^{commit})" ]; then
+              echo "Tag v$VERSION already exists and points to the current commit. Proceeding."
+            else
+              echo "Error: Tag v$VERSION already exists but points to a different commit"
+              exit 1
+            fi
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "v$VERSION" -m "Release version $VERSION"
+            git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+            git push origin "v$VERSION"
+            echo "✓ Created and pushed tag v$VERSION"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Find and Publish Draft Release
         id: publish_release
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -94,11 +94,11 @@ jobs:
               repo: context.repo.repo,
             });
 
-            // Find the draft release
-            const draftRelease = releases.find(release => release.draft === true);
+            // Find the draft release matching this version
+            const draftRelease = releases.find(release => release.draft === true && release.name.includes(version));
 
             if (draftRelease) {
-              console.log(`Found draft release: ${draftRelease.name}`);
+              console.log(`Found matching draft release: ${draftRelease.name}`);
 
               // Update and publish the draft release
               await github.rest.repos.updateRelease({
@@ -113,7 +113,7 @@ jobs:
               console.log(`✓ Published draft release as ${version}`);
               core.setOutput('released', 'true');
             } else {
-              console.log('⚠️ No draft release found. Creating release automatically.');
+              console.log('⚠️ No draft release found matching version ' + version + '. Creating release automatically.');
 
               await github.rest.repos.createRelease({
                 owner: context.repo.owner,
@@ -152,12 +152,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@fe02f34f77f8bf5c4f0454116efcf40eac0258b4 # v3
         with:
           version: 10
           run_install: false
@@ -175,15 +175,15 @@ jobs:
       - name: Run linting
         run: pnpm run lint
 
-      - name: Verify package contents
-        run: npm pack --dry-run
-
       - name: Sync version from VERSION file
         run: |
           VERSION="${{ needs.release.outputs.version }}"
           echo "Syncing package.json version to $VERSION"
           npm version "$VERSION" --no-git-tag-version --allow-same-version
           echo "✓ package.json version set to $VERSION"
+
+      - name: Verify package contents
+        run: npm pack --dry-run
 
       - name: Publish to npm
         run: npm publish --provenance --access public
