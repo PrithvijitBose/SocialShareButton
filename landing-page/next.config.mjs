@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
-  basePath: "/SocialShareButton",
-  assetPrefix: "/SocialShareButton",
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;
