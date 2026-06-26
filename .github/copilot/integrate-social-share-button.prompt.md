@@ -510,7 +510,7 @@ Only use this when the developer **explicitly** wants a reusable component wrapp
 Tell them to copy `src/social-share-button-react.jsx` from the library into their project:
 
 ```jsx
-import { SocialShareButton } from "./components/SocialShareButton";
+import SocialShareButton from "./components/SocialShareButton";
 
 function App() {
   return (
@@ -646,7 +646,7 @@ useEffect(() => {
 
 ## Output format
 
-- Ask the developer their **method** (CDN / npm / Wrapper Component) and their **framework** (only needed for CDN / Wrapper Component).
+- Ask the developer their **method** (CDN / npm / Wrapper Component) and their **framework** (needed to select the correct CDN integration steps or wrapper component).
 - Show only the snippet(s) relevant to their choices.
 - Always modify **existing** files — never suggest creating new component files (unless they explicitly ask for a Wrapper Component, in which case instruct them to copy the relevant file from `src/` to their components folder).
 - When modifying an existing file, mark additions with `// ADD THIS`.
