@@ -9,6 +9,19 @@ const ANALYTICS_SCHEMA_VERSION = "1.0";
 
 class SocialShareButton {
   constructor(options = {}) {
+    // Resolve container element early to prevent duplicate instances
+    const containerEl = options.container
+      ? typeof options.container === "string"
+        ? typeof document !== "undefined"
+          ? document.querySelector(options.container)
+          : null
+        : options.container
+      : null;
+
+    if (containerEl && containerEl._socialShareButtonInstance) {
+      return containerEl._socialShareButtonInstance;
+    }
+
     this.options = {
       url: options.url || (typeof window !== "undefined" ? window.location.href : ""),
       title: options.title || (typeof document !== "undefined" ? document.title : ""),
@@ -59,6 +72,17 @@ class SocialShareButton {
     this.ownsBodyLock = false; // Track if this instance owns the body overflow lock
     this.eventsAttached = false; // Guard against multiple attachEvents() calls
     this.isDestroyed = false; // Track if instance has been destroyed (prevents async callbacks)
+
+    this._dynamicUrl = !options.url;
+    this._dynamicTitle = !options.title;
+
+    if (containerEl) {
+      containerEl._socialShareButtonInstance = this;
+    }
+
+    if (typeof window !== "undefined" && SocialShareButton.instances) {
+      SocialShareButton.instances.add(this);
+    }
 
     if (this.options.container) {
       this.init();
@@ -592,6 +616,16 @@ class SocialShareButton {
       }
     }
 
+    // Remove from active instances registry
+    if (typeof window !== "undefined" && SocialShareButton.instances) {
+      SocialShareButton.instances.delete(this);
+    }
+
+    const containerEl = this._getContainer();
+    if (containerEl && containerEl._socialShareButtonInstance === this) {
+      delete containerEl._socialShareButtonInstance;
+    }
+
     // Clear references (makes destroy idempotent)
     this.button = null;
     this.modal = null;
@@ -801,11 +835,169 @@ class SocialShareButton {
       }
     }
   }
+
+  static updateCurrentPage() {
+    if (typeof window === "undefined" || !SocialShareButton.instances) return;
+    SocialShareButton.instances.forEach((instance) => {
+      const updates = {};
+      if (instance._dynamicUrl) {
+        updates.url = window.location.href;
+      }
+      if (instance._dynamicTitle) {
+        updates.title = document.title;
+      }
+      if (Object.keys(updates).length > 0) {
+        instance.updateOptions(updates);
+      }
+    });
+  }
 }
 
 // Static properties for shared body overflow management across all instances
 SocialShareButton.openModalCount = 0;
 SocialShareButton.originalBodyOverflow = null;
+SocialShareButton.instances = new Set();
+
+(function () {
+  // Helper for dynamic route changes in SPAs
+  function handleRouteChange() {
+    setTimeout(() => {
+      SocialShareButton.updateCurrentPage();
+    }, 50);
+  }
+
+  // Patch pushState and replaceState to track SPA routing dynamically
+  let isHistoryPatched = false;
+  function patchHistory() {
+    if (typeof window === "undefined" || !window.history || isHistoryPatched) return;
+    isHistoryPatched = true;
+
+    const wrap = (type) => {
+      const orig = window.history[type];
+      return function (...args) {
+        const result = orig.apply(this, args);
+        try {
+          const event = new CustomEvent("pushstate-or-replacestate", { detail: { type } });
+          window.dispatchEvent(event);
+        } catch (_e) {
+          // Ignore error
+        }
+        return result;
+      };
+    };
+
+    window.history.pushState = wrap("pushState");
+    window.history.replaceState = wrap("replaceState");
+  }
+
+  // Auto-initialize elements with `data-social-share` attribute
+  function autoInitElement(element) {
+    if (element._socialShareButtonInstance) return;
+
+    const options = { container: element };
+    const attrs = {
+      url: "data-url",
+      title: "data-title",
+      description: "data-description",
+      via: "data-via",
+      theme: "data-theme",
+      buttonText: "data-button-text",
+      customClass: "data-custom-class",
+      buttonColor: "data-button-color",
+      buttonHoverColor: "data-button-hover-color",
+      buttonStyle: "data-button-style",
+      modalPosition: "data-modal-position",
+    };
+
+    for (const [key, attr] of Object.entries(attrs)) {
+      const val = element.getAttribute(attr);
+      if (val !== null) {
+        options[key] = val;
+      }
+    }
+
+    if (element.hasAttribute("data-hashtags")) {
+      options.hashtags = element
+        .getAttribute("data-hashtags")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+
+    if (element.hasAttribute("data-platforms")) {
+      options.platforms = element
+        .getAttribute("data-platforms")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+
+    if (element.hasAttribute("data-show-button")) {
+      options.showButton = element.getAttribute("data-show-button") !== "false";
+    }
+
+    new SocialShareButton(options);
+  }
+
+  function autoInit(root = document) {
+    if (typeof document === "undefined") return;
+    if (root !== document && root.hasAttribute && root.hasAttribute("data-social-share")) {
+      autoInitElement(root);
+    }
+    const elements = root.querySelectorAll ? root.querySelectorAll("[data-social-share]") : [];
+    elements.forEach((element) => autoInitElement(element));
+  }
+
+  // Setup MutationObserver to watch for added/removed sharing components
+  let globalObserver = null;
+  function setupMutationObserver() {
+    if (typeof document === "undefined" || globalObserver) return;
+    globalObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        // Auto-cleanup on removal
+        if (mutation.removedNodes.length > 0) {
+          mutation.removedNodes.forEach((node) => {
+            if (node.nodeType !== 1) return;
+            if (SocialShareButton.instances) {
+              SocialShareButton.instances.forEach((instance) => {
+                const containerEl = instance._getContainer();
+                if (containerEl && (node === containerEl || node.contains(containerEl))) {
+                  instance.destroy();
+                }
+              });
+            }
+          });
+        }
+        // Auto-init on addition
+        if (mutation.addedNodes.length > 0) {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType !== 1) return;
+            autoInit(node);
+          });
+        }
+      });
+    });
+    globalObserver.observe(document.body, { childList: true, subtree: true });
+  }
+
+  // Initialize on browser load
+  if (typeof window !== "undefined" && typeof document !== "undefined") {
+    patchHistory();
+    window.addEventListener("popstate", handleRouteChange);
+    window.addEventListener("hashchange", handleRouteChange);
+    window.addEventListener("pushstate-or-replacestate", handleRouteChange);
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        autoInit();
+        setupMutationObserver();
+      });
+    } else {
+      autoInit();
+      setupMutationObserver();
+    }
+  }
+})();
 
 // Export for different module systems
 if (typeof module !== "undefined" && module.exports) {
