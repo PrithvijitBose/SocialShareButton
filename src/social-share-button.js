@@ -10,13 +10,7 @@ const ANALYTICS_SCHEMA_VERSION = "1.0";
 class SocialShareButton {
   constructor(options = {}) {
     // Resolve container element early to prevent duplicate instances
-    const containerEl = options.container
-      ? typeof options.container === "string"
-        ? typeof document !== "undefined"
-          ? document.querySelector(options.container)
-          : null
-        : options.container
-      : null;
+    const containerEl = SocialShareButton._resolveContainer(options.container);
 
     if (containerEl && containerEl._socialShareButtonInstance) {
       return containerEl._socialShareButtonInstance;
@@ -73,8 +67,10 @@ class SocialShareButton {
     this.eventsAttached = false; // Guard against multiple attachEvents() calls
     this.isDestroyed = false; // Track if instance has been destroyed (prevents async callbacks)
 
-    this._dynamicUrl = !options.url;
-    this._dynamicTitle = !options.title;
+    this._dynamicUrl = !options.url; // true when url was not provided; updateCurrentPage() will overwrite on SPA route changes
+    this._dynamicTitle = !options.title; // true when title was not provided; updateCurrentPage() will overwrite on SPA route changes
+
+    this._containerEl = containerEl; // Cache resolved element so cleanup still finds it after removal
 
     if (containerEl) {
       containerEl._socialShareButtonInstance = this;
@@ -110,18 +106,10 @@ class SocialShareButton {
     `;
 
     this.button = button;
-    if (this.options.container) {
-      const container =
-        typeof this.options.container === "string"
-          ? document.querySelector(this.options.container)
-          : this.options.container;
-
-      if (container) {
-        container.appendChild(button);
-      }
+    if (this._containerEl) {
+      this._containerEl.appendChild(button);
     }
   }
-
   createModal() {
     const modal = document.createElement("div");
     modal.className = `social-share-modal-overlay ${this.options.theme}`;
@@ -727,15 +715,24 @@ class SocialShareButton {
   // ---------------------------------------------------------------------------
 
   /**
+   * Resolves a raw container value (string selector or Element) to a DOM Element.
+   * Returns null if the container is absent, the selector matches nothing, or
+   * document is unavailable (e.g. SSR).
+   * @param {string|Element|null|undefined} raw
+   * @returns {Element|null}
+   */
+  static _resolveContainer(raw) {
+    if (!raw) return null;
+    if (typeof document === "undefined") return null;
+    return typeof raw === "string" ? document.querySelector(raw) : raw;
+  }
+
+  /**
    * Returns the host container element, or null when no container is configured.
    * @returns {Element|null}
    */
   _getContainer() {
-    if (!this.options.container) return null;
-    if (typeof document === "undefined") return null;
-    return typeof this.options.container === "string"
-      ? document.querySelector(this.options.container)
-      : this.options.container;
+    return this._containerEl || null;
   }
 
   /**
@@ -839,6 +836,8 @@ class SocialShareButton {
   static updateCurrentPage() {
     if (typeof window === "undefined" || !SocialShareButton.instances) return;
     SocialShareButton.instances.forEach((instance) => {
+      // Only refresh fields that were auto-defaulted from the page;
+      // caller-supplied url/title values must remain unchanged.
       const updates = {};
       if (instance._dynamicUrl) {
         updates.url = window.location.href;
@@ -941,6 +940,17 @@ SocialShareButton.instances = new Set();
 
   function autoInit(root = document) {
     if (typeof document === "undefined") return;
+
+    // Fast short-circuit: skip nodes appended by the library itself to avoid redundant scans
+    if (
+      root !== document &&
+      root.classList &&
+      (root.classList.contains("social-share-btn") ||
+        root.classList.contains("social-share-modal-overlay"))
+    ) {
+      return;
+    }
+
     if (root !== document && root.hasAttribute && root.hasAttribute("data-social-share")) {
       autoInitElement(root);
     }
@@ -950,9 +960,12 @@ SocialShareButton.instances = new Set();
 
   // Setup MutationObserver to watch for added/removed sharing components
   let globalObserver = null;
+  let initTimeout = null;
   function setupMutationObserver() {
     if (typeof document === "undefined" || globalObserver) return;
     globalObserver = new MutationObserver((mutations) => {
+      let needsInit = false;
+
       mutations.forEach((mutation) => {
         // Auto-cleanup on removal
         if (mutation.removedNodes.length > 0) {
@@ -968,14 +981,25 @@ SocialShareButton.instances = new Set();
             }
           });
         }
-        // Auto-init on addition
-        if (mutation.addedNodes.length > 0) {
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType !== 1) return;
-            autoInit(node);
-          });
+
+        // Track if there are any element additions to trigger a batched scan
+        if (!needsInit && mutation.addedNodes.length > 0) {
+          for (let i = 0; i < mutation.addedNodes.length; i++) {
+            if (mutation.addedNodes[i].nodeType === 1) {
+              needsInit = true;
+              break;
+            }
+          }
         }
       });
+
+      // Batch/debounce auto-init to avoid costly scans on every single added node
+      if (needsInit) {
+        if (initTimeout) clearTimeout(initTimeout);
+        initTimeout = setTimeout(() => {
+          autoInit(document); // Single global scan is highly optimized natively
+        }, 10);
+      }
     });
     globalObserver.observe(document.body, { childList: true, subtree: true });
   }
