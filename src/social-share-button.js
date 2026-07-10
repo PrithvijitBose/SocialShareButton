@@ -628,6 +628,8 @@ class SocialShareButton {
   }
 
   updateOptions(options, isInternalRefresh = false) {
+    // External updates recompute dynamic flags, while internal SPA refreshes
+    // preserve caller-supplied values to maintain the auto-update contract.
     if (!isInternalRefresh) {
       if (options.url !== undefined) {
         this._dynamicUrl = !options.url;
@@ -974,17 +976,20 @@ SocialShareButton.instances = new Set();
 
       mutations.forEach((mutation) => {
         // Auto-cleanup on removal
-        if (mutation.removedNodes.length > 0) {
+        // Fast-path: Skip costly removal traversal if we have no active tracked instances
+        if (
+          mutation.removedNodes.length > 0 &&
+          SocialShareButton.instances &&
+          SocialShareButton.instances.size > 0
+        ) {
           mutation.removedNodes.forEach((node) => {
             if (node.nodeType !== 1) return;
-            if (SocialShareButton.instances) {
-              SocialShareButton.instances.forEach((instance) => {
-                const containerEl = instance._getContainer();
-                if (containerEl && (node === containerEl || node.contains(containerEl))) {
-                  instance.destroy();
-                }
-              });
-            }
+            SocialShareButton.instances.forEach((instance) => {
+              const containerEl = instance._getContainer();
+              if (containerEl && (node === containerEl || node.contains(containerEl))) {
+                instance.destroy();
+              }
+            });
           });
         }
 
