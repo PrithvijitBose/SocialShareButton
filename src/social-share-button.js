@@ -72,6 +72,12 @@ class SocialShareButton {
 
     this._containerEl = containerEl; // Cache resolved element so cleanup still finds it after removal
 
+    // If a container was specified but could not be resolved (e.g. SSR or missing DOM node),
+    // abort registration and initialization to prevent orphan instances and DOM errors.
+    if (this.options.container && !this._containerEl) {
+      return;
+    }
+
     if (containerEl) {
       containerEl._socialShareButtonInstance = this;
     }
@@ -621,7 +627,16 @@ class SocialShareButton {
     this.eventsAttached = false; // Reset re-entrancy guard
   }
 
-  updateOptions(options) {
+  updateOptions(options, isInternalRefresh = false) {
+    if (!isInternalRefresh) {
+      if (options.url !== undefined) {
+        this._dynamicUrl = !options.url;
+      }
+      if (options.title !== undefined) {
+        this._dynamicTitle = !options.title;
+      }
+    }
+
     this.options = { ...this.options, ...options };
 
     // Update URL in modal if it exists
@@ -714,23 +729,14 @@ class SocialShareButton {
   //                         systems to all receive the same event simultaneously.
   // ---------------------------------------------------------------------------
 
-  /**
-   * Resolves a raw container value (string selector or Element) to a DOM Element.
-   * Returns null if the container is absent, the selector matches nothing, or
-   * document is unavailable (e.g. SSR).
-   * @param {string|Element|null|undefined} raw
-   * @returns {Element|null}
-   */
+  // Resolves a raw container value (string or Element) to a DOM Element, or null if absent/SSR.
   static _resolveContainer(raw) {
     if (!raw) return null;
     if (typeof document === "undefined") return null;
     return typeof raw === "string" ? document.querySelector(raw) : raw;
   }
 
-  /**
-   * Returns the host container element, or null when no container is configured.
-   * @returns {Element|null}
-   */
+  // Returns the cached host container element, or null.
   _getContainer() {
     return this._containerEl || null;
   }
@@ -846,7 +852,7 @@ class SocialShareButton {
         updates.title = document.title;
       }
       if (Object.keys(updates).length > 0) {
-        instance.updateOptions(updates);
+        instance.updateOptions(updates, true);
       }
     });
   }
@@ -993,10 +999,12 @@ SocialShareButton.instances = new Set();
         }
       });
 
-      // Batch/debounce auto-init to avoid costly scans on every single added node
-      if (needsInit) {
-        if (initTimeout) clearTimeout(initTimeout);
+      // Batch auto-init to avoid costly scans on every single added node.
+      // If a timeout is already pending, we let it run (throttle vs debounce)
+      // so continuous DOM mutations don't indefinitely delay initialization.
+      if (needsInit && !initTimeout) {
         initTimeout = setTimeout(() => {
+          initTimeout = null;
           autoInit(document); // Single global scan is highly optimized natively
         }, 10);
       }
