@@ -4,15 +4,20 @@ import { useEffect, useState } from "react";
 
 export function Stats() {
   const stats = [
-    { value: 10, label: "KB GZIPPED", suffix: "" },
-    { value: 7, label: "NETWORKS", suffix: "" },
-    { value: 0, label: "DEPENDENCIES", suffix: "" },
-    { value: 4, label: "FRAMEWORKS", suffix: "" },
+    { value: 10, label: "KB GZIPPED", prefix: "<", suffix: " KB" },
+    { value: 7, label: "NETWORKS", prefix: "", suffix: "" },
+    { value: 0, label: "DEPENDENCIES", prefix: "", suffix: "" },
+    { value: 4, label: "FRAMEWORKS", prefix: "", suffix: "" },
   ];
 
   const [animatedValues, setAnimatedValues] = useState(stats.map(() => 0));
 
   useEffect(() => {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setAnimatedValues(stats.map(stat => stat.value));
+      return;
+    }
+
     const duration = 2000; // 2 seconds animation
     const steps = 60;
     const interval = duration / steps;
@@ -50,7 +55,7 @@ export function Stats() {
           {stats.map((stat, i) => (
             <div key={i} className="py-6 sm:py-8 text-center flex flex-col items-center justify-center">
               <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-1 transition-all duration-300">
-                {stat.value === 10 ? `<${animatedValues[i]} KB` : animatedValues[i]}
+                {stat.prefix}{animatedValues[i]}{stat.suffix}
               </span>
               <span className="text-[10px] sm:text-xs font-bold tracking-widest uppercase opacity-80">
                 {stat.label}

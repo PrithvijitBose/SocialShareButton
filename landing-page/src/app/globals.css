@@ -38,6 +38,11 @@
   html {
     scroll-behavior: smooth;
   }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -67,10 +72,10 @@
 
   @keyframes shine {
     0% {
-      left: -100%;
+      transform: translateX(-100%);
     }
     100% {
-      left: 100%;
+      transform: translateX(100%);
     }
   }
 
@@ -93,5 +98,13 @@
 
   .animate-scroll-left {
     animation: scroll-left 40s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-scroll-left,
+    .animate-float,
+    .animate-shine {
+      animation: none !important;
+    }
   }
 }

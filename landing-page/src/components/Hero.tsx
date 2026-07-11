@@ -31,7 +31,7 @@ export function Hero() {
                 href="/docs"
                 className="bg-[#FFCC00] text-black px-6 py-3 rounded-full font-bold hover:brightness-110 transition-all border-2 border-transparent dark:border-none"
               >
-                Configure Agentic Skills
+                Get Started →
               </Link>
               <Link
                 href="#playground"

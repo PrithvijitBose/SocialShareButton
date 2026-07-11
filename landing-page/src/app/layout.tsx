@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Lightweight social share button library",
   icons: {
     icon: "/SocialShare_logo.webp",
-    apple: "/SocialShare_logo.webp",
+    apple: "/apple-icon.png",
   },
 };
 
