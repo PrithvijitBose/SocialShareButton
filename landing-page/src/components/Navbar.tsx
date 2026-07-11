@@ -8,14 +8,13 @@ export function Navbar() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 lg:left-[120px] lg:right-[120px] z-50 border-b border-white/10 bg-background/80 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-primary flex items-center justify-center">
-            </div>
-            <span className="font-semibold text-xl tracking-tight">
+            <img src="/SocialShare_logo.webp" alt="SocialShareButton Logo" className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20" />
+            <span className="font-semibold text-lg sm:text-xl tracking-tight">
               Social<br /><span className="text-primary leading-tight block -mt-1">ShareButton</span>
             </span>
           </div>
@@ -23,12 +22,6 @@ export function Navbar() {
           {/* Right actions */}
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-            <a 
-              href="https://github.com/AOSSIE-Org/SocialShareButton"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
-            ></a>
             </div>
 
             <button
@@ -40,8 +33,8 @@ export function Navbar() {
             </button>
 
             <Link
-              href="#docs"
-              className="bg-primary text-primary-foreground px-5 py-2 rounded-full font-medium text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20"
+              href="/docs"
+              className="bg-primary text-primary-foreground px-3 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20"
             >
               Get Started →
             </Link>
