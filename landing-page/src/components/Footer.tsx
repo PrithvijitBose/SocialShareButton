@@ -134,8 +134,6 @@ export function Footer() {
                   aria-label="Contact by Mail"
                   className="text-neutral-500 hover:text-[#FFCC00] transition"
                   href="mailto:aossie.oss@gmail.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   <Mail className="w-6 h-6" />
                 </a>
