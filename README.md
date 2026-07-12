@@ -12,9 +12,9 @@
 > **Maintainer:** @kpj2006
 
 <!-- Organization Logo -->
-<div align="center" style="display: flex; align-items: center; justify-content: center; gap: 16px;">
-  <img alt="Stability Nexus" src="public/aossie_logo.svg" width="175">
-  <!-- <img src="public/todo-project-logo.svg" width="175" /> -->
+<div align="center" style="display: flex; align-items: flex-end; justify-content: center; gap: 16px;">
+  <img alt="Social Share Button" src="public/socialshare.png" height="150">
+  <img alt="AOSSIE" src="public/aossie_logo.svg" height="130">
 </div>
 
 &nbsp;
