@@ -2,21 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-export function Stats() {
-  const stats = [
-    { value: 10, label: "KB GZIPPED", prefix: "<", suffix: " KB" },
-    { value: 7, label: "NETWORKS", prefix: "", suffix: "" },
-    { value: 0, label: "DEPENDENCIES", prefix: "", suffix: "" },
-    { value: 4, label: "FRAMEWORKS", prefix: "", suffix: "" },
-  ];
+const stats = [
+  { value: 10, label: "KB GZIPPED", prefix: "<", suffix: " KB" },
+  { value: 7, label: "NETWORKS", prefix: "", suffix: "" },
+  { value: 0, label: "DEPENDENCIES", prefix: "", suffix: "" },
+  { value: 4, label: "FRAMEWORKS", prefix: "", suffix: "" },
+];
 
+export function Stats() {
   const [animatedValues, setAnimatedValues] = useState(stats.map(() => 0));
 
-  useEffect(() => {
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setAnimatedValues(stats.map(stat => stat.value));
-      return;
-    }
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
