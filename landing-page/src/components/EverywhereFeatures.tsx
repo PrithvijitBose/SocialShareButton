@@ -44,10 +44,13 @@ export function EverywhereFeatures() {
     },
   ];
 
+  const [paused, setPaused] = useState(false);
+  // Duplicate the deck so the track can loop seamlessly.
+  const track = [...cards, ...cards];
+
   return (
-    <div className="py-24 bg-background border-t-2 border-black dark:border-white">
+    <div className="py-24 bg-background border-t-2 border-black dark:border-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         <div className="mb-16">
           <span className="text-xs font-bold tracking-widest text-[#FFCC00] uppercase mb-4 block">
             HOW IT WORKS
@@ -56,6 +59,7 @@ export function EverywhereFeatures() {
             Wherever content<br />gets <span className="underline decoration-[#FFCC00] decoration-4 underline-offset-8">shared.</span>
           </h2>
         </div>
+      </div>
 
         <div className="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto pb-12 pt-4 snap-x hide-scrollbar">
           {cards.map((card, i) => (
@@ -97,7 +101,7 @@ export function EverywhereFeatures() {
                 <p className={`text-[12px] sm:text-[14px] md:text-[15px] opacity-90 leading-relaxed font-semibold mb-6 sm:mb-8 transition-transform duration-300`}>
                   {card.desc}
                 </p>
-                
+
                 <div>
                   <Link href="/docs" className="inline-block text-xs sm:text-sm font-bold px-4 sm:px-6 py-2 sm:py-3 bg-black text-white dark:bg-white dark:text-black rounded-full shadow-sm hover:opacity-80 transition cursor-pointer hover:scale-105 hover:shadow-lg transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black dark:focus:ring-white">
                     Learn more
@@ -107,7 +111,6 @@ export function EverywhereFeatures() {
             </div>
           ))}
         </div>
-        
       </div>
     </div>
   );
