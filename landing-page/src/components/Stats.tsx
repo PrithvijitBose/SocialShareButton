@@ -17,6 +17,12 @@ export function Stats() {
       setAnimatedValues(stats.map(stat => stat.value));
       return;
     }
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      setAnimatedValues(stats.map(s => s.value));
+      return;
+    }
 
     const duration = 2000; // 2 seconds animation
     const steps = 60;
