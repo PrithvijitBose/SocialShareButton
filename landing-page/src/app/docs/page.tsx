@@ -1,5 +1,5 @@
 "use client";
-
+// import documente page
 import Link from "next/link";
 import { useState } from "react";
 import { SiteNavbar } from "@/components/SiteNavbar";
@@ -98,7 +98,7 @@ export default function Docs() {
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-6 sm:mb-8">
                     Why SocialShareButton?
                   </h2>
-                  
+
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -131,16 +131,16 @@ export default function Docs() {
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-6 sm:mb-8">
                     How to Get Started
                   </h2>
-                  
+
                   <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8">
                     You have exactly <span className="font-bold text-[#00C853]">three steps</span> between you and a live share button.
                   </p>
 
                   <div className="bg-[#00C853]/10 dark:bg-[#00C853]/5 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border-l-4 border-[#00C853]">
                     <pre className="text-sm sm:text-base md:text-lg font-mono whitespace-pre-wrap">
-1.  Load the library   →   one line in your HTML or package install
-2.  Drop a div         →   place it wherever you want the button
-3.  Initialize         →   one line of JavaScript
+                      1.  Load the library   →   one line in your HTML or package install
+                      2.  Drop a div         →   place it wherever you want the button
+                      3.  Initialize         →   one line of JavaScript
                     </pre>
                   </div>
 
@@ -153,7 +153,7 @@ export default function Docs() {
                     <p className="text-sm sm:text-base mb-4">
                       Open the chat, type <code className="bg-black dark:bg-white text-white dark:text-black px-2 py-1 rounded text-sm">@workspace</code>, then copy the public prompt from:
                     </p>
-                    <a 
+                    <a
                       href="https://github.com/AOSSIE-Org/SocialShareButton/blob/main/.github/copilot/integrate-social-share-button.prompt.md"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -174,7 +174,7 @@ export default function Docs() {
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-6 sm:mb-8">
                     Want to Track Every Share?
                   </h2>
-                  
+
                   <p className="text-base sm:text-lg mb-6 sm:mb-8">
                     SocialShareButton emits rich events locally — you forward them to whatever analytics tool you already use (Google Analytics, Mixpanel, Plausible, or your own). <span className="font-bold">Zero extra vendors. Zero new data contracts.</span>
                   </p>
@@ -201,7 +201,7 @@ export default function Docs() {
                     <p className="text-sm sm:text-base mb-4">
                       Open and copy the analytics prompt from:
                     </p>
-                    <a 
+                    <a
                       href="https://github.com/AOSSIE-Org/SocialShareButton/blob/main/.github/copilot/integrate-analytics.prompt.md"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -222,7 +222,7 @@ export default function Docs() {
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-6 sm:mb-8">
                     What Clients Are Building with It
                   </h2>
-                  
+
                   <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                     {[
                       {
@@ -268,10 +268,10 @@ export default function Docs() {
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-6 sm:mb-8">
                     Ready to Go?
                   </h2>
-                  
+
                   <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8">
                     Install takes under five minutes. Support is on{' '}
-                    <a 
+                    <a
                       href="https://discord.com/channels/1022871757289422898/1479012884209078365"
                       target="_blank"
                       rel="noopener noreferrer"
