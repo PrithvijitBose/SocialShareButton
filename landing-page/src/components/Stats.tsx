@@ -23,30 +23,22 @@ export function Stats() {
     const steps = 60;
     const interval = duration / steps;
 
-    const timers = stats.map((stat, index) => {
-      let currentStep = 0;
-      const timer = setInterval(() => {
-        currentStep++;
-        const progress = currentStep / steps;
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        const targetValue = stat.value;
-        const newValue = Math.floor(targetValue * easeOutQuart);
-        
-        setAnimatedValues(prev => {
-          const newValues = [...prev];
-          newValues[index] = newValue;
-          return newValues;
-        });
+    let currentStep = 0;
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
 
-        if (currentStep >= steps) {
-          clearInterval(timer);
-        }
-      }, interval);
+      setAnimatedValues(
+        stats.map(stat => Math.floor(stat.value * easeOutQuart))
+      );
 
-      return timer;
-    });
+      if (currentStep >= steps) {
+        clearInterval(timer);
+      }
+    }, interval);
 
-    return () => timers.forEach(timer => clearInterval(timer));
+    return () => clearInterval(timer);
   }, []);
 
   return (

@@ -65,7 +65,7 @@ export function EverywhereFeatures() {
               key={i} 
               onMouseEnter={() => setHoveredCard(i)}
               onMouseLeave={() => setHoveredCard(null)}
-              className={`snap-center shrink-0 w-[280px] sm:w-[300px] md:w-[350px] lg:w-[400px] rounded-[32px] p-6 sm:p-8 md:p-10 relative flex flex-col transition-all duration-700 ease-in-out border-[3px] border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] ${card.color} ${card.textColor} aspect-square cursor-pointer
+              className={`snap-center shrink-0 w-[280px] sm:w-[300px] md:w-[350px] lg:w-[400px] rounded-[32px] p-6 sm:p-8 md:p-10 relative flex flex-col transition-all duration-700 ease-in-out border-[3px] border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] ${card.color} ${card.textColor} aspect-square
                 hover:-translate-y-4 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)]
                 hover:rotate-[360deg] hover:scale-110
                 ${hoveredCard === i ? 'z-10' : 'z-0'}
