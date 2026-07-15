@@ -44,7 +44,9 @@ export function EverywhereFeatures() {
     },
   ];
 
-
+  const [paused, setPaused] = useState(false);
+  // Duplicate the deck so the track can loop seamlessly.
+  const track = [...cards, ...cards];
 
   return (
     <div className="py-24 bg-background border-t-2 border-black dark:border-white overflow-hidden">
