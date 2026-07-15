@@ -44,7 +44,7 @@ export function EverywhereFeatures() {
     },
   ];
 
-  const [paused, setPaused] = useState(false);
+  // const [paused, setPaused] = useState(false);
   // Duplicate the deck so the track can loop seamlessly.
   const track = [...cards, ...cards];
 
@@ -62,7 +62,7 @@ export function EverywhereFeatures() {
       </div>
 
         <div className="flex gap-4 sm:gap-6 md:gap-8 overflow-x-auto pb-12 pt-4 snap-x hide-scrollbar">
-          {cards.map((card, i) => (
+          {track.map((card, i) => (
             <div 
               key={i} 
               onMouseEnter={() => setHoveredCard(i)}
