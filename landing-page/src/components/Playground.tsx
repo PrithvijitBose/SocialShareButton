@@ -65,7 +65,7 @@ export function Playground() {
   const outlineColor = whiteOnLight ? "#000000" : color;
 
   return (
-    <div className="py-24 bg-background">
+    <div id="playground" className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="mb-12">
