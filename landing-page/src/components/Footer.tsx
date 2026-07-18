@@ -1,8 +1,9 @@
 'use client'
 
-import Link from 'next/link'
+
 import { motion } from 'framer-motion'
 import { Github, Mail, Linkedin, Youtube } from 'lucide-react'
+import Image from 'next/image'
 import logo from '../../../public/socialshare.png'
 
 // Lucide doesn't ship brand logos for Discord, so a small inline SVG covers it.
@@ -16,19 +17,6 @@ function DiscordIcon({ className }: { className?: string }) {
     >
       <path d="M20.317 4.369A19.791 19.791 0 0 0 15.885 3c-.211.375-.444.879-.608 1.279a18.27 18.27 0 0 0-5.487 0A12.64 12.64 0 0 0 9.182 3a19.736 19.736 0 0 0-4.435 1.369C1.578 9.045.769 13.579 1.174 18.053a19.9 19.9 0 0 0 5.993 3.03c.484-.66.914-1.36 1.285-2.096a12.3 12.3 0 0 1-2.023-.975c.17-.124.336-.253.497-.386 3.902 1.804 8.13 1.804 11.986 0 .163.133.329.262.497.386-.646.389-1.325.719-2.026.977.372.735.8 1.435 1.284 2.095a19.86 19.86 0 0 0 6.002-3.03c.475-5.177-.8-9.669-3.352-13.685ZM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.419 0 1.334-.955 2.419-2.157 2.419Zm7.974 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.419 0 1.334-.947 2.419-2.157 2.419Z" />
     </svg>
-  )
-}
-
-interface NavLinkProps {
-  href: string
-  children: React.ReactNode
-}
-
-function NavLink({ href, children }: NavLinkProps) {
-  return (
-    <Link href={href} className="transition hover:text-[#FFCC00]">
-      {children}
-    </Link>
   )
 }
 
@@ -74,7 +62,7 @@ export function Footer() {
             </a>
 
             <a
-              href="#"
+              href="./docs"
               className="flex items-center justify-between bg-transparent border border-neutral-800 hover:border-neutral-600 rounded-xl p-4 transition-colors group"
             >
               <div className="flex items-center gap-4">
@@ -118,8 +106,8 @@ export function Footer() {
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={logo.src}
+                <Image
+                  src={logo}
                   alt="SocialShareButton logo"
                   className="w-auto h-24 rounded-lg"
                 />
@@ -145,8 +133,6 @@ export function Footer() {
                   aria-label="Contact by Mail"
                   className="text-neutral-500 hover:text-[#FFCC00] transition"
                   href="mailto:aossie.oss@gmail.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   <Mail className="w-6 h-6" />
                 </a>
