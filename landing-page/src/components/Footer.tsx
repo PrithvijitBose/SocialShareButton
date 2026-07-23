@@ -61,9 +61,15 @@ export function Footer() {
               </span>
             </a>
 
-            <a
-              href="./docs"
+import Link from 'next/link'
+
+...
+            <Link
+              href="/docs"
               className="flex items-center justify-between bg-transparent border border-neutral-800 hover:border-neutral-600 rounded-xl p-4 transition-colors group"
+            >
+...
+            </Link>
             >
               <div className="flex items-center gap-4">
                 <div className="w-8 h-8 rounded-lg bg-[#00C853] flex items-center justify-center flex-shrink-0">
